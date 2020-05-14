@@ -585,6 +585,7 @@ type DomainInterfaceDriverHost struct {
 	ECN      string `xml:"ecn,attr,omitempty"`
 	UFO      string `xml:"ufo,attr,omitempty"`
 	MrgRXBuf string `xml:"mrg_rxbuf,attr,omitempty"`
+	Standby  string `xml:"standby,attr,omitempty"`
 }
 
 type DomainInterfaceDriverGuest struct {
@@ -1274,6 +1275,15 @@ type DomainMemBalloon struct {
 	Address     *DomainAddress          `xml:"address"`
 }
 
+type DomainVhostUser struct {
+	XMLName   xml.Name       `xml:"vhostuser"`
+	ID        string         `xml:"id,attr"`
+	PATH      string         `xml:"path,attr"`
+	Reconnect string         `xml:"reconnect,attr,omitempty"`
+	Queues    string         `xml:"queues,attr,omitempty"`
+	Address   *DomainAddress `xml:"address"`
+}
+
 type DomainVSockCID struct {
 	Auto    string `xml:"auto,attr,omitempty"`
 	Address string `xml:"address,attr,omitempty"`
@@ -1678,6 +1688,7 @@ type DomainDeviceList struct {
 	Hubs         []DomainHub         `xml:"hub"`
 	Watchdog     *DomainWatchdog     `xml:"watchdog"`
 	MemBalloon   *DomainMemBalloon   `xml:"memballoon"`
+	Vhostuser    []DomainVhostUser   `xml:"vhostuser"`
 	RNGs         []DomainRNG         `xml:"rng"`
 	NVRAM        *DomainNVRAM        `xml:"nvram"`
 	Panics       []DomainPanic       `xml:"panic"`
@@ -4047,6 +4058,18 @@ func (d *DomainVideo) Unmarshal(doc string) error {
 }
 
 func (d *DomainVideo) Marshal() (string, error) {
+	doc, err := xml.MarshalIndent(d, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(doc), nil
+}
+
+func (d *DomainVhostUser) Unmarshal(doc string) error {
+	return xml.Unmarshal([]byte(doc), d)
+}
+
+func (d *DomainVhostUser) Marshal() (string, error) {
 	doc, err := xml.MarshalIndent(d, "", "  ")
 	if err != nil {
 		return "", err
